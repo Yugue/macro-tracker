@@ -6,4 +6,5 @@ const double maleProtPoundRatio = 1.0;
 
 const double femaleProtPoundRatio = 0.8;
 
-const double bulkingProtFactor = 1.2;
+const double bulkingProtFactor = 1.0;
+const double notBulkingProtFactor = 0.8;

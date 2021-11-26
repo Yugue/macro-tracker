@@ -25,84 +25,128 @@ class _InputInfoState extends State<InputInfo> {
   Gender? _gender;
   final List<bool> _plan = <bool>[false, false];
   double? _proteinGoal;
+  double? _carbGoal;
+  double? _fatGoal;
 
   double calculateProt() {
     return _weight *
         (_gender == Gender.male ? maleProtPoundRatio : femaleProtPoundRatio) *
-        (_plan[0] ? bulkingProtFactor : 1.0);
+        (_plan[0] ? bulkingProtFactor : notBulkingProtFactor);
+  }
+
+  double calculateCarb() {
+    return _weight *
+        (_gender == Gender.male ? maleProtPoundRatio : femaleProtPoundRatio) *
+        (_plan[0] ? bulkingProtFactor : notBulkingProtFactor);
+  }
+
+  double calculateFat() {
+    return _weight *
+        (_gender == Gender.male ? maleProtPoundRatio : femaleProtPoundRatio) *
+        (_plan[0] ? bulkingProtFactor : notBulkingProtFactor);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          decoration: const InputDecoration(labelText: "Enter your weight (lbs)"),
-          keyboardType: TextInputType.number,
-          inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
-          onChanged: (String data) {
-            setState(() {
-              _weight = int.parse(data);
-            });
-          },
-        ),
-        const SizedBox(height: 20.0),
-        Row(
-          children: [
-            Text(
-              'Enter your gender',
-              style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey[700]),
-            ),
-            const SizedBox(width: 40.0),
-            DropdownButton<Gender>(
-              hint: Text('-', style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey[700])),
-              // value: releaseData[substepName],
-              icon: const Icon(Icons.arrow_downward),
-              items: Gender.values.map<DropdownMenuItem<Gender>>((Gender gender) {
-                return DropdownMenuItem<Gender>(
-                  value: gender,
-                  child: Text(InputInfo.genderStr[gender]!),
-                );
-              }).toList(),
-              onChanged: (Gender? newValue) {
-                setState(() {
-                  _gender = newValue!;
-                });
-              },
-              value: _gender,
-            ),
-          ],
-        ),
-        const SizedBox(height: 20.0),
-        ToggleButtons(
-          children: const <Widget>[
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text('Bulking'),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text('Cutting'),
-            ),
-          ],
-          onPressed: (int index) {
-            setState(() {
-              _plan[index] = !_plan[index];
-            });
-          },
-          isSelected: _plan,
-        ),
-        const SizedBox(height: 20.0),
-        ElevatedButton(
-          child: const Text('Calculate'),
-          onPressed: () {
-            setState(() {
-              _proteinGoal = calculateProt();
-            });
-          },
-        ),
-        if (_proteinGoal != null) SelectableText(_proteinGoal.toString()),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          TextField(
+            decoration: const InputDecoration(labelText: "Enter your weight (lbs)"),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+            onChanged: (String data) {
+              setState(() {
+                _weight = int.parse(data);
+              });
+            },
+          ),
+          const SizedBox(height: 20.0),
+          Row(
+            children: [
+              Text(
+                'Enter your gender',
+                style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey[700]),
+              ),
+              const SizedBox(width: 40.0),
+              DropdownButton<Gender>(
+                hint: Text('-', style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey[700])),
+                // value: releaseData[substepName],
+                icon: const Icon(Icons.arrow_downward),
+                items: Gender.values.map<DropdownMenuItem<Gender>>((Gender gender) {
+                  return DropdownMenuItem<Gender>(
+                    value: gender,
+                    child: Text(InputInfo.genderStr[gender]!),
+                  );
+                }).toList(),
+                onChanged: (Gender? newValue) {
+                  setState(() {
+                    _gender = newValue!;
+                  });
+                },
+                value: _gender,
+              ),
+            ],
+          ),
+          const SizedBox(height: 20.0),
+          ToggleButtons(
+            children: const <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text('Bulking'),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text('Cutting'),
+              ),
+            ],
+            onPressed: (int index) {
+              setState(() {
+                _plan[index] = !_plan[index];
+              });
+            },
+            isSelected: _plan,
+          ),
+          const SizedBox(height: 20.0),
+          ElevatedButton(
+            child: const Text('Calculate'),
+            onPressed: () {
+              setState(() {
+                _proteinGoal = calculateProt();
+              });
+              setState(() {
+                _carbGoal = calculateCarb();
+              });
+              setState(() {
+                _fatGoal = calculateFat();
+              });
+            },
+          ),
+          const SizedBox(height: 40.0),
+          Table(
+            children: [
+              TableRow(
+                children: [
+                  const Text('Protein'),
+                  SelectableText(_proteinGoal.toString()),
+                ],
+              ),
+              TableRow(
+                children: [
+                  const Text('Carb'),
+                  SelectableText(_carbGoal.toString()),
+                ],
+              ),
+              TableRow(
+                children: [
+                  const Text('Fat'),
+                  SelectableText(_fatGoal.toString()),
+                ],
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 }
