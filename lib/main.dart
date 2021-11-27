@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'state/macro_state.dart';
 import 'widgets/input_info.dart';
 
 void main() {
@@ -14,13 +16,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Macro Tracker',
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Welcome to Macro Tracker'), actions: []),
-        body: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-          child: InputInfo(),
+    return ChangeNotifierProvider(
+      create: (BuildContext context) => MacroState(),
+      child: MaterialApp(
+        title: 'Macro Tracker',
+        home: Scaffold(
+          appBar: AppBar(title: const Text('A simple Macro Tracker'), actions: []),
+          body: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+            child: InputInfo(),
+          ),
         ),
       ),
     );

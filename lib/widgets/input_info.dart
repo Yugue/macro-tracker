@@ -4,9 +4,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../models/gender.dart';
+import '../models/macros.dart';
 import '../models/policies.dart';
+import '../state/macro_state.dart';
 
 class InputInfo extends StatefulWidget {
   const InputInfo({Key? key}) : super(key: key);
@@ -17,6 +20,11 @@ class InputInfo extends StatefulWidget {
   static const Map<Gender, String> genderStr = <Gender, String>{
     Gender.male: 'Male',
     Gender.female: 'Female',
+  };
+  static const Map<Macros, String> macroStr = <Macros, String>{
+    Macros.protein: 'Protein',
+    Macros.carb: 'Carbohydrate',
+    Macros.fat: 'Fat',
   };
 }
 
@@ -48,6 +56,8 @@ class _InputInfoState extends State<InputInfo> {
 
   @override
   Widget build(BuildContext context) {
+    final Map<Macros, double>? macrosGoal = context.watch<MacroState>().macrosGoal;
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -111,38 +121,30 @@ class _InputInfoState extends State<InputInfo> {
           ElevatedButton(
             child: const Text('Calculate'),
             onPressed: () {
-              setState(() {
-                _proteinGoal = calculateProt();
-              });
-              setState(() {
-                _carbGoal = calculateCarb();
-              });
-              setState(() {
-                _fatGoal = calculateFat();
-              });
+              context.read<MacroState>().updateMacro(Macros.protein, calculateProt());
+              context.read<MacroState>().updateMacro(Macros.carb, calculateCarb());
+              context.read<MacroState>().updateMacro(Macros.fat, calculateFat());
+              // setState(() {
+              //   _proteinGoal = calculateProt();
+              // });
+              // setState(() {
+              //   _carbGoal = calculateCarb();
+              // });
+              // setState(() {
+              //   _fatGoal = calculateFat();
+              // });
             },
           ),
           const SizedBox(height: 40.0),
           Table(
-            children: [
-              TableRow(
-                children: [
-                  const Text('Protein'),
-                  SelectableText(_proteinGoal.toString()),
-                ],
-              ),
-              TableRow(
-                children: [
-                  const Text('Carb'),
-                  SelectableText(_carbGoal.toString()),
-                ],
-              ),
-              TableRow(
-                children: [
-                  const Text('Fat'),
-                  SelectableText(_fatGoal.toString()),
-                ],
-              ),
+            children: <TableRow>[
+              for (MapEntry macroElement in InputInfo.macroStr.entries)
+                TableRow(children: <Widget>[
+                  Center(child: Text('${macroElement.value}:')),
+                  Center(
+                    child: SelectableText(macrosGoal?[macroElement.key].toString() ?? 'unknown'),
+                  ),
+                ])
             ],
           )
         ],
